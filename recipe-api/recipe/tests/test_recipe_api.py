@@ -6,7 +6,7 @@ from rest_framework.test import APIClient
 from parameterized import parameterized
 
 from core.models import Recipe, Ingredient
-from recipe.serializers import RecipeSerializer
+from recipe.serializers import RecipeSerializer, SimpleIngredientSerializer
 
 RECIPES_URL = reverse("recipe:recipe-list")
 
@@ -58,6 +58,8 @@ class PublicRecipeApiTests(TestCase):
 
     def test_view_recipe_detail(self):
         recipe = sample_recipe()
+        sample_ingredient(recipe=recipe)
+        ingredient2 = sample_ingredient(recipe=recipe)
 
         url = detail_url(recipe.id)
         res = self.client.get(url)
@@ -65,8 +67,11 @@ class PublicRecipeApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
         serializer = RecipeSerializer(recipe)
+        ingredient_serializer = SimpleIngredientSerializer(ingredient2)
 
         self.assertEqual(res.data, serializer.data)
+        self.assertEqual(len(res.data['ingredients']), 2)
+        self.assertIn(ingredient_serializer.data, res.data['ingredients'])
 
     @parameterized.expand([
         ("", {"name": "test", "description": "desc"}),
@@ -136,7 +141,7 @@ class PublicRecipeApiTests(TestCase):
 
     def test_patch_recipe_name(self):
         recipe = sample_recipe()
-        ing1 = sample_ingredient(recipe=recipe)
+        sample_ingredient(recipe=recipe)
 
         payload = {
             "name": "new recipe"
@@ -148,6 +153,26 @@ class PublicRecipeApiTests(TestCase):
 
         recipe.refresh_from_db()
         self.assertEqual(recipe.name, payload["name"])
+
+        allIngredientsCount = Ingredient.objects.count()
+        self.assertEqual(allIngredientsCount, 1)
+
+    def test_patch_recipe_description(self):
+        recipe = sample_recipe()
+        sample_ingredient(recipe=recipe)
+
+        payload = {
+            "description": "new description"
+        }
+
+        res = self.client.patch(detail_url(recipe.id), payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        name = recipe.name
+        recipe.refresh_from_db()
+        self.assertEqual(recipe.name, name)
+        self.assertEqual(recipe.description, payload['description'])
 
         allIngredientsCount = Ingredient.objects.count()
         self.assertEqual(allIngredientsCount, 1)
@@ -179,7 +204,8 @@ class PublicRecipeApiTests(TestCase):
         sample_ingredient(recipe=recipe)
 
         payload = {
-            "name": "new recipe"
+            "name": "new recipe",
+            "description": ""
         }
 
         res = self.client.put(detail_url(recipe.id), payload, format="json")
@@ -188,6 +214,7 @@ class PublicRecipeApiTests(TestCase):
 
         recipe.refresh_from_db()
         self.assertEqual(recipe.name, payload["name"])
+        self.assertFalse(recipe.description)
 
         allIngredientsCount = Ingredient.objects.count()
         self.assertEqual(allIngredientsCount, 0)
@@ -204,7 +231,7 @@ class PublicRecipeApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn("required", str(res.data))
 
-    def test_put_recipe(self):
+    def test_put_recipe_full(self):
         recipe = sample_recipe()
         sample_ingredient(recipe=recipe)
         sample_ingredient(recipe=recipe)
@@ -212,7 +239,8 @@ class PublicRecipeApiTests(TestCase):
         new_ingred = {"name": "banana"}
         payload = {
             "name": "new recipe",
-            "ingredients": [new_ingred]
+            'description': "new description",
+            "ingredients": [new_ingred],
         }
 
         res = self.client.put(detail_url(recipe.id), payload, format="json")
@@ -221,6 +249,7 @@ class PublicRecipeApiTests(TestCase):
 
         recipe.refresh_from_db()
         self.assertEqual(recipe.name, payload["name"])
+        self.assertEqual(recipe.description, payload["description"])
 
         allIngredients = Ingredient.objects.all()
         self.assertEqual(len(allIngredients), 1)
