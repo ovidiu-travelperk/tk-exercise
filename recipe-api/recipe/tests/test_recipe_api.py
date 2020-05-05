@@ -254,3 +254,39 @@ class PublicRecipeApiTests(TestCase):
         all_ingredients = Ingredient.objects.all()
         self.assertEqual(len(all_ingredients), 1)
         self.assertEqual(all_ingredients[0].name, new_ingred["name"])
+
+    def test_delete_recipe(self):
+        rec1 = sample_recipe()
+        rec2 = sample_recipe()
+
+        res = self.client.delete(detail_url(rec1.id))
+
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+
+        recipes = Recipe.objects.all()
+        self.assertEqual(len(recipes), 1)
+        self.assertNotIn(rec1, recipes)
+        self.assertIn(rec2, recipes)
+
+    def test_delete_recipe_with_ingredients(self):
+        rec1 = sample_recipe()
+        sample_ingredient(recipe=rec1)
+        sample_ingredient(recipe=rec1)
+        rec2 = sample_recipe()
+        ing2 = sample_ingredient(recipe=rec2)
+
+        self.assertEqual(len(Ingredient.objects.all()), 3)
+
+        res = self.client.delete(detail_url(rec1.id))
+
+        self.assertEqual(res.status_code, status.HTTP_204_NO_CONTENT)
+
+        recipes = Recipe.objects.all()
+        self.assertEqual(len(recipes), 1)
+        self.assertNotIn(rec1, recipes)
+        self.assertIn(rec2, recipes)
+
+        ingredients = Ingredient.objects.all()
+        self.assertEqual(len(ingredients), 1)
+        self.assertIn(ing2, ingredients)
+
