@@ -2,14 +2,11 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
-import json
 
 from parameterized import parameterized
 
 from core.models import Recipe, Ingredient
-from recipe.serializers import RecipeSerializer, \
-    IngredientSerializer, \
-    SimpleIngredientSerializer
+from recipe.serializers import RecipeSerializer
 
 RECIPES_URL = reverse("recipe:recipe-list")
 
@@ -72,14 +69,14 @@ class PublicRecipeApiTests(TestCase):
         self.assertEqual(res.data, serializer.data)
 
     @parameterized.expand([
-        ("unu", {"name": "test", "description": "desc"}),
-        ("doi", {"name": "test", "description": "desc"}),
+        ("", {"name": "test", "description": "desc"}),
+        ("", {"name": "test recip", "description": "description"}),
     ])
-    def test_create_recipe(self, name, recipe):
+    def test_create_recipe_no_ingredients(self, name, recipe):
         payload = recipe
 
-        res = self.client.post(RECIPES_URL, payload, format='json')
-        print(res.data)
+        res = self.client.post(RECIPES_URL, payload, format="json")
+
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
         dbrecipe = Recipe.objects.get(id=res.data["id"])
@@ -95,7 +92,7 @@ class PublicRecipeApiTests(TestCase):
     def test_create_recipe_incomplete(self, name, incomplete_recipe):
         payload = incomplete_recipe
 
-        res = self.client.post(RECIPES_URL, payload, format='json')
+        res = self.client.post(RECIPES_URL, payload, format="json")
 
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -104,17 +101,127 @@ class PublicRecipeApiTests(TestCase):
             "name": "recip",
             "ingredients": [],
         }),
+        ("", {
+            "name": "recip",
+            "ingredients": [{"name": "onion"}, {"name": "mustard"}],
+        })
     ])
     def test_create_recipe_with_ingredients(self, name, recipe):
         payload = recipe
 
-        res = self.client.post(RECIPES_URL, payload, format='json')
-        
+        res = self.client.post(RECIPES_URL, payload, format="json")
+
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
         dbrecipe = Recipe.objects.get(id=res.data["id"])
         dbingredients = dbrecipe.ingredients.all()
 
-        ingredients = payload['ingredients']
+        ingredients = payload["ingredients"]
         self.assertEqual(len(ingredients), len(dbingredients))
 
+    def test_create_recipe_same_ingredients(self):
+        (ing1, ing2) = ({"name": "onion"}, {"name": "mustard"})
+
+        recipe1 = {"name": "recip1", "ingredients": [ing1, ing2]}
+        self.client.post(RECIPES_URL, recipe1, format="json")
+
+        recipe2 = {
+            "name": "recip2", "ingredients": [
+                ing1, ing2, {
+                    "name": "flour"}]}
+        self.client.post(RECIPES_URL, recipe2, format="json")
+
+        allIngredientsCount = Ingredient.objects.count()
+        self.assertEqual(allIngredientsCount, 5)
+
+    def test_patch_recipe_name(self):
+        recipe = sample_recipe()
+        ing1 = sample_ingredient(recipe=recipe)
+
+        payload = {
+            "name": "new recipe"
+        }
+
+        res = self.client.patch(detail_url(recipe.id), payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        recipe.refresh_from_db()
+        self.assertEqual(recipe.name, payload["name"])
+
+        allIngredientsCount = Ingredient.objects.count()
+        self.assertEqual(allIngredientsCount, 1)
+
+    def test_patch_recipe_ingredients(self):
+        recipe = sample_recipe()
+        sample_ingredient(recipe=recipe)
+        sample_ingredient(recipe=recipe)
+
+        new_ingred = {"name": "banana"}
+        payload = {
+            "ingredients": [new_ingred]
+        }
+
+        res = self.client.patch(detail_url(recipe.id), payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        recipeName = recipe.name
+        recipe.refresh_from_db
+        self.assertEqual(recipe.name, recipeName)
+
+        allIngredients = Ingredient.objects.all()
+        self.assertEqual(len(allIngredients), 1)
+        self.assertEqual(allIngredients[0].name, new_ingred["name"])
+
+    def test_put_recipe_name(self):
+        recipe = sample_recipe()
+        sample_ingredient(recipe=recipe)
+
+        payload = {
+            "name": "new recipe"
+        }
+
+        res = self.client.put(detail_url(recipe.id), payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        recipe.refresh_from_db()
+        self.assertEqual(recipe.name, payload["name"])
+
+        allIngredientsCount = Ingredient.objects.count()
+        self.assertEqual(allIngredientsCount, 0)
+
+    def test_put_recipe_ingredients(self):
+        recipe = sample_recipe()
+
+        payload = {
+            "ingredients": []
+        }
+
+        res = self.client.put(detail_url(recipe.id), payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("required", str(res.data))
+
+    def test_put_recipe(self):
+        recipe = sample_recipe()
+        sample_ingredient(recipe=recipe)
+        sample_ingredient(recipe=recipe)
+
+        new_ingred = {"name": "banana"}
+        payload = {
+            "name": "new recipe",
+            "ingredients": [new_ingred]
+        }
+
+        res = self.client.put(detail_url(recipe.id), payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        recipe.refresh_from_db()
+        self.assertEqual(recipe.name, payload["name"])
+
+        allIngredients = Ingredient.objects.all()
+        self.assertEqual(len(allIngredients), 1)
+        self.assertEqual(allIngredients[0].name, new_ingred["name"])

@@ -17,7 +17,7 @@ class IngredientSerializer(serializers.ModelSerializer):
 
 
 class RecipeSerializer(serializers.ModelSerializer):
-    ingredients = SimpleIngredientSerializer(many=True)
+    ingredients = SimpleIngredientSerializer(many=True, required=False)
 
     class Meta:
         model = Recipe
@@ -25,15 +25,31 @@ class RecipeSerializer(serializers.ModelSerializer):
         read_only_fields = ('id',)
 
     def create(self, validated_data):
-        ingredients_validated_data = validated_data.pop('ingredients')
-        recipe = Recipe.objects.create(**validated_data)
+        ingredients_validated_data = validated_data.pop('ingredients', None)
+        recipe = super().create(validated_data)
 
-        for ingredient in ingredients_validated_data:
-            ingredient['recipe'] = recipe
+        if ingredients_validated_data:
+            for ingredient in ingredients_validated_data:
+                ingredient['recipe'] = recipe
 
-        ingredient_set_serializer = self.fields['ingredients']
-        ingredient_set_serializer.create(ingredients_validated_data)
+            ingredient_set_serializer = self.fields['ingredients']
+            ingredient_set_serializer.create(ingredients_validated_data)
+
         return recipe
 
-    def validate(self, attrs):
-        return attrs
+    def update(self, instance, validated_data):
+        ingredients_validated_data = validated_data.pop('ingredients', None)
+
+        super().update(instance, validated_data)
+
+        isPatch = self.partial
+        if (isPatch and ingredients_validated_data) or (not isPatch):
+            instance.ingredients.all().delete()
+
+        if ingredients_validated_data:
+            for ingredient in ingredients_validated_data:
+                ingredient['recipe'] = instance
+            ingredient_set_serializer = self.fields['ingredients']
+            ingredient_set_serializer.create(ingredients_validated_data)
+
+        return instance
