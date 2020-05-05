@@ -1,6 +1,7 @@
 from rest_framework import viewsets
 from core.models import Recipe, Ingredient
 from recipe import serializers
+import pdb
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
@@ -23,6 +24,15 @@ class RecipeViewSet(viewsets.ModelViewSet):
         self._ensure_ingredients_populated(request)
 
         return super().update(request, *args, **kwargs)
+
+    def get_queryset(self):
+        name = self.request.query_params.get('name', None)
+        # pdb.set_trace()
+        queryset = self.queryset.all()
+        if name:
+            queryset = queryset.filter(name__icontains=name)
+
+        return queryset
 
 
 class IngredientViewSet(viewsets.ModelViewSet):

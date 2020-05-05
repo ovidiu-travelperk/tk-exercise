@@ -50,7 +50,8 @@ class PublicRecipeApiTests(TestCase):
         sample_recipe()
         sample_recipe()
 
-        res = self.client.get(RECIPES_URL)
+        newClient = APIClient()
+        res = newClient.get(RECIPES_URL)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
@@ -289,4 +290,23 @@ class PublicRecipeApiTests(TestCase):
         ingredients = Ingredient.objects.all()
         self.assertEqual(len(ingredients), 1)
         self.assertIn(ing2, ingredients)
+
+    @parameterized.expand([
+        ("", "Pi", 2),
+        ("", "P", 3),
+        ("", "Piz", 1),
+        ("", "", 4),
+        ("", "test", 0),
+        ("", "io", 2)
+    ])
+    def test_get_recipe_by_name(self, test_name, search_term, expected_length):
+        sample_recipe(name='Pizza')
+        sample_recipe(name='Pistachio')
+        sample_recipe(name='Icecream')
+        sample_recipe(name='Carpacio')
+
+        res = self.client.get(RECIPES_URL, {'name': search_term})
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), expected_length)
 
