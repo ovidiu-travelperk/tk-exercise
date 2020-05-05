@@ -125,19 +125,19 @@ class PublicRecipeApiTests(TestCase):
         self.assertEqual(len(ingredients), len(dbingredients))
 
     def test_create_recipe_same_ingredients(self):
-        (ing1, ing2) = ({"name": "onion"}, {"name": "mustard"})
+        ingredients = [{"name": "onion"}, {"name": "mustard"}]
 
-        recipe1 = {"name": "recip1", "ingredients": [ing1, ing2]}
+        recipe1 = {"name": "recip1", "ingredients": ingredients}
         self.client.post(RECIPES_URL, recipe1, format="json")
 
         recipe2 = {
             "name": "recip2", "ingredients": [
-                ing1, ing2, {
+                *ingredients, {
                     "name": "flour"}]}
         self.client.post(RECIPES_URL, recipe2, format="json")
 
-        allIngredientsCount = Ingredient.objects.count()
-        self.assertEqual(allIngredientsCount, 5)
+        all_ingredients_count = Ingredient.objects.count()
+        self.assertEqual(all_ingredients_count, 5)
 
     def test_patch_recipe_name(self):
         recipe = sample_recipe()
@@ -154,8 +154,8 @@ class PublicRecipeApiTests(TestCase):
         recipe.refresh_from_db()
         self.assertEqual(recipe.name, payload["name"])
 
-        allIngredientsCount = Ingredient.objects.count()
-        self.assertEqual(allIngredientsCount, 1)
+        all_ingredients_count = Ingredient.objects.count()
+        self.assertEqual(all_ingredients_count, 1)
 
     def test_patch_recipe_description(self):
         recipe = sample_recipe()
@@ -174,8 +174,8 @@ class PublicRecipeApiTests(TestCase):
         self.assertEqual(recipe.name, name)
         self.assertEqual(recipe.description, payload['description'])
 
-        allIngredientsCount = Ingredient.objects.count()
-        self.assertEqual(allIngredientsCount, 1)
+        all_ingredients_count = Ingredient.objects.count()
+        self.assertEqual(all_ingredients_count, 1)
 
     def test_patch_recipe_ingredients(self):
         recipe = sample_recipe()
@@ -195,9 +195,9 @@ class PublicRecipeApiTests(TestCase):
         recipe.refresh_from_db
         self.assertEqual(recipe.name, recipeName)
 
-        allIngredients = Ingredient.objects.all()
-        self.assertEqual(len(allIngredients), 1)
-        self.assertEqual(allIngredients[0].name, new_ingred["name"])
+        all_ingredients = Ingredient.objects.all()
+        self.assertEqual(len(all_ingredients), 1)
+        self.assertEqual(all_ingredients[0].name, new_ingred["name"])
 
     def test_put_recipe_name(self):
         recipe = sample_recipe()
@@ -216,8 +216,8 @@ class PublicRecipeApiTests(TestCase):
         self.assertEqual(recipe.name, payload["name"])
         self.assertFalse(recipe.description)
 
-        allIngredientsCount = Ingredient.objects.count()
-        self.assertEqual(allIngredientsCount, 0)
+        all_ingredients_count = Ingredient.objects.count()
+        self.assertEqual(all_ingredients_count, 0)
 
     def test_put_recipe_ingredients(self):
         recipe = sample_recipe()
@@ -251,6 +251,6 @@ class PublicRecipeApiTests(TestCase):
         self.assertEqual(recipe.name, payload["name"])
         self.assertEqual(recipe.description, payload["description"])
 
-        allIngredients = Ingredient.objects.all()
-        self.assertEqual(len(allIngredients), 1)
-        self.assertEqual(allIngredients[0].name, new_ingred["name"])
+        all_ingredients = Ingredient.objects.all()
+        self.assertEqual(len(all_ingredients), 1)
+        self.assertEqual(all_ingredients[0].name, new_ingred["name"])

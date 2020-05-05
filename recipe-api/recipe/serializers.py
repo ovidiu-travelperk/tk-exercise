@@ -28,9 +28,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         ingredients_validated_data = validated_data.pop('ingredients', None)
 
         def handle_ingredients(recipe):
-            isPatch = self.partial
+            is_patch = self.partial
             if is_update:
-                if(isPatch and ingredients_validated_data) or (not isPatch):
+                if(is_patch and ingredients_validated_data) or (not is_patch):
                     recipe.ingredients.all().delete()
 
             if ingredients_validated_data:
