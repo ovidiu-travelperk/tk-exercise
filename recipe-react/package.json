@@ -35,7 +35,6 @@
   },
   "devDependencies": {
     "faker": "^4.1.0",
-    "jest": "^26.0.1",
     "react-use": "^14.2.0"
   }
 }

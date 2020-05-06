@@ -17,14 +17,17 @@ describe("RecipeApp", () => {
   test("should call getRecipes at start", async () => {
     const recipes = recipeFabricator.times(10);
     getRecipes.mockReturnValueOnce({ data: recipes });
+
     const { getByTestId } = renderRecipeApp();
+
     expect(getRecipes).toHaveBeenCalledTimes(1);
     expect(getRecipes).toHaveBeenCalledWith();
+
     await waitForElementToBeRemoved(() => getByTestId("Loading"))
+
     recipes.forEach((recipe) =>
       validateSingleRecipeListing({ recipe, getByTestId })
     );
-    await wait();
   });
 });
 
