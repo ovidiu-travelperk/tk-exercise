@@ -1,7 +1,7 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import RecipeApp from './RecipeApp'
+import RecipeApp from './app/RecipeApp'
 
 function App() {
   return (
