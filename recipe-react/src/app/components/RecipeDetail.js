@@ -17,9 +17,16 @@ function RecipeDetail({ id, name, ingredients, onUpdate }) {
     });
   };
 
-  const handleRecipeRename = (oldValue, newValue) => {
+  const handleRenameRecipe = (oldValue, newValue) => {
     updateRecipe({
       name: newValue,
+    });
+  };
+
+  const handleAddIngredient = (oldValue, newValue) => {
+    if (!Boolean(newValue.trim())) return;
+    updateRecipe({
+      ingredients: [...(ingredients || []), { name: newValue }],
     });
   };
 
@@ -38,10 +45,10 @@ function RecipeDetail({ id, name, ingredients, onUpdate }) {
     <div>
       <h1>Recipe Detail</h1>
       <h2>
-        <EditableValue value={name} onValueChanged={handleRecipeRename} />
+        <EditableValue value={name} onValueChanged={handleRenameRecipe} />
       </h2>
 
-      {ingredients ? (
+      {ingredients && ingredients.length ? (
         <ul>
           {ingredients.map((ingredient) => {
             return (
@@ -58,6 +65,14 @@ function RecipeDetail({ id, name, ingredients, onUpdate }) {
       ) : (
         <div>No ingredients</div>
       )}
+      <div>
+        <EditableValue
+          value=""
+          onValueChanged={handleAddIngredient}
+          onlyEdit
+          placeholder="&#xf067; Add ingredient..."
+        />
+      </div>
     </div>
   );
 }

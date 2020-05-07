@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useInputState } from "../hooks/useInputState";
 
-function EditableValue({ value, onValueChanged }) {
+function EditableValue({ value, onValueChanged, onlyEdit, placeholder }) {
   const [isEdited, setIsEdited] = useState(false);
   const [newValue, handleValueChange, resetNewValue] = useInputState(
     () => value
@@ -11,7 +11,8 @@ function EditableValue({ value, onValueChanged }) {
     resetNewValue();
   }, [value]);
 
-  const changeValue = () => {
+  const changeValue = (e) => {
+    if (e) e.preventDefault();
     setIsEdited(false);
     if (newValue == value) return;
 
@@ -20,14 +21,19 @@ function EditableValue({ value, onValueChanged }) {
   };
 
   return (
-    <div onClick={() => setIsEdited(true)} onBlur={changeValue}>
-      {isEdited ? (
-        <input
-          autoFocus
-          type="text"
-          value={newValue}
-          onChange={handleValueChange}
-        />
+    <div onClick={() => setIsEdited(true)}>
+      {isEdited || onlyEdit ? (
+        <form onSubmit={changeValue}>
+          <input
+            autoFocus
+            type="text"
+            value={newValue}
+            onChange={handleValueChange}
+            onBlur={changeValue}
+            style={{ fontFamily: "FontAwesome, Arial", padding: "2px" }}
+            placeholder={placeholder}
+          />
+        </form>
       ) : (
         <div>{value}</div>
       )}

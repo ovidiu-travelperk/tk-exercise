@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import { getRecipes } from "../../data/recipe/api";
 import { recipeFabricator } from "../../data/recipe/fabricators";
+import { v4 as uuidv4 } from "uuid";
 
 export const RecipesDataContext = createContext();
 export const RecipesActionsContext = createContext();
@@ -20,7 +21,7 @@ const apiRecipeActions = (getRecipesData, setRecipesData) => {
 };
 
 const localRecipeActions = (getRecipesData, setRecipesData) => {
-  const defaultRecipes =  recipeFabricator.times(10);
+  const defaultRecipes = recipeFabricator.times(10);
   const localRecipes = () =>
     JSON.parse(localStorage.getItem("recipes")) || defaultRecipes;
 
@@ -41,6 +42,25 @@ const localRecipeActions = (getRecipesData, setRecipesData) => {
         recipes: data.recipes.map((rcp) =>
           rcp.id === recipe.id ? { ...rcp, ...recipe } : rcp
         ),
+      }));
+    },
+    addRecipe: (recipe) => {
+      recipe = {
+        ingredients: [],
+        ...recipe,
+        id: uuidv4(),
+      };
+
+      setRecipesData((data) => ({
+        ...data,
+        recipes: [...data.recipes, recipe],
+        lastAddedRecipeId: recipe.id
+      }));
+    },
+    deleteRecipe: (recipe) => {
+      setRecipesData((data) => ({
+        ...data,
+        recipes: data.recipes.filter((rcp) => rcp !== recipe),
       }));
     },
   };

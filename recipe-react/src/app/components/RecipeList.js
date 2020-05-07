@@ -4,31 +4,48 @@ import {
   RecipesActionsContext,
   RecipesDataContext,
 } from "../contexts/RecipesContext";
+import EditableValue from "./EditableValue";
+import RecipeItem from "./RecipeItem";
 
 function RecipeList() {
   const [selectedRecipeId, setSelectedRecipeId] = useState();
 
-  const { refreshRecipes, updateRecipe } = useContext(RecipesActionsContext);
-  const { recipes, loading } = useContext(RecipesDataContext);
+  const { refreshRecipes, updateRecipe, addRecipe, deleteRecipe } = useContext(
+    RecipesActionsContext
+  );
+  const { recipes, loading, lastAddedRecipeId } = useContext(RecipesDataContext);
 
   useEffect(() => refreshRecipes(), []);
+  useEffect(() => {
+    setSelectedRecipeId(lastAddedRecipeId);
+  }, [lastAddedRecipeId])
 
+  const handleAddRecipe = (oldName, newName) => {
+    addRecipe({ name: newName });
+  };
   const renderRecipes = () => {
     if (!recipes) return;
 
     return (
       <>
+        <EditableValue
+          onlyEdit
+          value=""
+          onValueChanged={handleAddRecipe}
+          placeholder="&#xf067; Add recipe..."
+        />
         {recipes.map((recipe, i) => {
           const isSelected = selectedRecipeId == recipe.id;
           return (
-            <div
-              key={recipe.id}
-              data-testid={`Recipe-${recipe.id}`}
-              onClick={() => setSelectedRecipeId(recipe.id)}
-              style={isSelected ? { border: "1px solid" } : {}}
-            >
-              {recipe.name}
-            </div>
+            <>
+              <RecipeItem
+                key={recipe.id}
+                recipe={recipe}
+                onSelect={setSelectedRecipeId}
+                onDelete={deleteRecipe}
+                isSelected={isSelected}
+              />
+            </>
           );
         })}
       </>
