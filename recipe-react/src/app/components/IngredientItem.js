@@ -1,5 +1,5 @@
 import React from "react";
-import EditableValue from "./EditableValue";
+import EditableField from "./EditableField";
 
 function IngredientItem({ ingredient, onRename, onDelete }) {
   const handleRename = (oldName, newName) => {
@@ -13,7 +13,7 @@ function IngredientItem({ ingredient, onRename, onDelete }) {
 
   return (
     <div>
-      <EditableValue value={ingredient.name} onValueChanged={handleRename} />
+      <EditableField value={ingredient.name} onValueChanged={handleRename} />
       <div onClick={handleDelete}>
         <i className="far fa-trash-alt"></i>
       </div>

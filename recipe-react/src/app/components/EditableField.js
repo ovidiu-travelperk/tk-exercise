@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useInputState } from "../hooks/useInputState";
 
-function EditableValue({ value, onValueChanged, onlyEdit, placeholder }) {
+function EditableField({ value, onValueChanged, onlyEdit, placeholder }) {
   const [isEdited, setIsEdited] = useState(false);
   const [newValue, handleValueChange, resetNewValue] = useInputState(
     () => value
@@ -39,4 +39,4 @@ function EditableValue({ value, onValueChanged, onlyEdit, placeholder }) {
   );
 }
 
-export default EditableValue;
+export default EditableField;

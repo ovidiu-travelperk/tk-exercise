@@ -1,6 +1,6 @@
 import React from "react";
 import IngredientItem from "./IngredientItem";
-import EditableValue from "./EditableValue";
+import EditableField from "./EditableField";
 
 function RecipeDetail({ id, name, ingredients, onUpdate }) {
   const handleRenameIngredient = (ingredient, newName) => {
@@ -46,7 +46,7 @@ function RecipeDetail({ id, name, ingredients, onUpdate }) {
     <div>
       <h1>Recipe Detail</h1>
       <h2>
-        <EditableValue value={name} onValueChanged={handleRenameRecipe} />
+        <EditableField value={name} onValueChanged={handleRenameRecipe} />
       </h2>
 
       {ingredients && ingredients.length ? (
@@ -68,7 +68,7 @@ function RecipeDetail({ id, name, ingredients, onUpdate }) {
         <div>No ingredients</div>
       )}
       <div>
-        <EditableValue
+        <EditableField
           value=""
           onValueChanged={handleAddIngredient}
           onlyEdit

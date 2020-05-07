@@ -4,7 +4,7 @@ import {
   RecipesActionsContext,
   RecipesDataContext,
 } from "../contexts/RecipesContext";
-import EditableValue from "./EditableValue";
+import EditableField from "./EditableField";
 import RecipeItem from "./RecipeItem";
 
 function RecipeList() {
@@ -33,7 +33,7 @@ function RecipeList() {
 
     return (
       <>
-        <EditableValue
+        <EditableField
           onlyEdit
           value=""
           onValueChanged={handleAddRecipe}
