@@ -2,9 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useInputState } from "../hooks/useInputState";
 import EditableValue from "./EditableValue";
 
-function IngredientItem({ ingredient, onRenameIngredient }) {
+function IngredientItem({ ingredient, onRename }) {
   const handleRename = (oldName, newName) => {
-    if (onRenameIngredient) onRenameIngredient(ingredient, newName);
+    if (onRename) onRename(ingredient, newName);
   };
 
   return (

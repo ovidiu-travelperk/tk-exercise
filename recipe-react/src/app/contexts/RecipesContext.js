@@ -1,4 +1,4 @@
-import React, { createContext, useState } from "react";
+import React, { createContext, useState, useEffect } from "react";
 import { getRecipes } from "../../data/recipe/api";
 import { recipeFabricator } from "../../data/recipe/fabricators";
 
@@ -20,17 +20,32 @@ const apiRecipeActions = (getRecipesData, setRecipesData) => {
 };
 
 const localRecipeActions = (getRecipesData, setRecipesData) => {
-  const mockRecipes = recipeFabricator.times(10);
+  const defaultRecipes =  recipeFabricator.times(10);
+  const localRecipes = () =>
+    JSON.parse(localStorage.getItem("recipes")) || defaultRecipes;
+
+  const handleRecipesChanged = (recipesData) => {
+    localStorage.setItem("recipes", JSON.stringify(recipesData.recipes));
+  };
+
   const recipeActions = {
     refreshRecipes: () => {
       setRecipesData(() => ({
-        recipes: mockRecipes,
+        recipes: localRecipes(),
         loading: false,
+      }));
+    },
+    updateRecipe: (recipe) => {
+      setRecipesData((data) => ({
+        ...data,
+        recipes: data.recipes.map((rcp) =>
+          rcp.id === recipe.id ? { ...rcp, ...recipe } : rcp
+        ),
       }));
     },
   };
 
-  return recipeActions;
+  return { recipeActions, handleRecipesChanged };
 };
 
 export function RecipesProvider(props) {
@@ -39,7 +54,14 @@ export function RecipesProvider(props) {
     loading: false,
   });
 
-  const recipeActions = localRecipeActions(()=> recipesData, setRecipesData);
+  const { recipeActions, handleRecipesChanged } = localRecipeActions(
+    () => recipesData,
+    setRecipesData
+  );
+
+  useEffect(() => {
+    if (handleRecipesChanged) handleRecipesChanged(recipesData);
+  }, [recipesData]);
 
   return (
     <RecipesDataContext.Provider value={recipesData}>

@@ -1,43 +1,51 @@
 import React, { useState, useEffect, useContext } from "react";
 import RecipeDetail from "./RecipeDetail";
-import { RecipesActionsContext, RecipesDataContext } from "../contexts/RecipesContext";
+import {
+  RecipesActionsContext,
+  RecipesDataContext,
+} from "../contexts/RecipesContext";
 
 function RecipeList() {
+  const [selectedRecipeId, setSelectedRecipeId] = useState();
 
-  const [selectedRecipe, setSelectedRecipe] = useState();
+  const { refreshRecipes, updateRecipe } = useContext(RecipesActionsContext);
+  const { recipes, loading } = useContext(RecipesDataContext);
 
-  const recipeActions = useContext(RecipesActionsContext)
-  const {recipes, loading} = useContext(RecipesDataContext)
-
-  useEffect(() => recipeActions.refreshRecipes(), []);
+  useEffect(() => refreshRecipes(), []);
 
   const renderRecipes = () => {
-    console.log(recipes);
     if (!recipes) return;
 
     return (
       <>
-        {recipes.map((recipe, i) => (
-          <div
-            key={recipe.id}
-            data-testid={`Recipe-${recipe.id}`}
-            onClick={() => setSelectedRecipe(recipe)}
-          >
-            {recipe.name}
-          </div>
-        ))}
+        {recipes.map((recipe, i) => {
+          const isSelected = selectedRecipeId == recipe.id;
+          return (
+            <div
+              key={recipe.id}
+              data-testid={`Recipe-${recipe.id}`}
+              onClick={() => setSelectedRecipeId(recipe.id)}
+              style={isSelected ? { border: "1px solid" } : {}}
+            >
+              {recipe.name}
+            </div>
+          );
+        })}
       </>
     );
   };
 
+  const selectedRecipe = recipes.find((r) => r.id == selectedRecipeId);
   return (
     <div>
       <div>Recipe list here</div>
-      <div style={{border: "1px solid black"}}>
+      <div style={{ border: "1px solid black" }}>
         {loading && <div data-testid="Loading">Loading</div>}
         {renderRecipes()}
       </div>
-      {selectedRecipe && <RecipeDetail {...selectedRecipe} />}
+      {selectedRecipe && (
+        <RecipeDetail {...selectedRecipe} onUpdate={updateRecipe} />
+      )}
     </div>
   );
 }
