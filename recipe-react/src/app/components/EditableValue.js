@@ -7,14 +7,12 @@ function EditableValue({ value, onValueChanged, onlyEdit, placeholder }) {
     () => value
   );
 
-  useEffect(() => {
-    resetNewValue();
-  }, [value]);
+  useEffect(resetNewValue, [value]);
 
   const changeValue = (e) => {
     if (e) e.preventDefault();
     setIsEdited(false);
-    if (newValue == value) return;
+    if (newValue === value) return;
 
     if (onValueChanged) onValueChanged(value, newValue);
     resetNewValue();

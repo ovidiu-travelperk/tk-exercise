@@ -25,12 +25,13 @@ class RecipeSerializer(serializers.ModelSerializer):
         read_only_fields = ('id',)
 
     def _handle_ingredients_data(self, validated_data, is_update=False):
+        has_ingredients = 'ingredients' in validated_data
         ingredients_validated_data = validated_data.pop('ingredients', None)
 
         def handle_ingredients(recipe):
             is_patch = self.partial
             if is_update:
-                if(is_patch and ingredients_validated_data) or (not is_patch):
+                if(is_patch and has_ingredients) or (not is_patch):
                     recipe.ingredients.all().delete()
 
             if ingredients_validated_data:

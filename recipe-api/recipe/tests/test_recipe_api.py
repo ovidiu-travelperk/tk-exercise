@@ -200,6 +200,26 @@ class PublicRecipeApiTests(TestCase):
         self.assertEqual(len(all_ingredients), 1)
         self.assertEqual(all_ingredients[0].name, new_ingred["name"])
 
+    def test_patch_recipe_no_ingredients(self):
+        recipe = sample_recipe()
+        sample_ingredient(recipe=recipe)
+        sample_ingredient(recipe=recipe)
+
+        payload = {
+            "ingredients": []
+        }
+
+        res = self.client.patch(detail_url(recipe.id), payload, format="json")
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        recipeName = recipe.name
+        recipe.refresh_from_db
+        self.assertEqual(recipe.name, recipeName)
+
+        all_ingredients = Ingredient.objects.all()
+        self.assertEqual(len(all_ingredients), 0)
+
     def test_put_recipe_name(self):
         recipe = sample_recipe()
         sample_ingredient(recipe=recipe)

@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from "react";
-import { useInputState } from "../hooks/useInputState";
+import React from "react";
 import EditableValue from "./EditableValue";
 
 function IngredientItem({ ingredient, onRename, onDelete }) {
@@ -16,7 +15,7 @@ function IngredientItem({ ingredient, onRename, onDelete }) {
     <div>
       <EditableValue value={ingredient.name} onValueChanged={handleRename} />
       <div onClick={handleDelete}>
-        <i class="far fa-trash-alt"></i>
+        <i className="far fa-trash-alt"></i>
       </div>
     </div>
   );

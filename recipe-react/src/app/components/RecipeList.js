@@ -13,12 +13,17 @@ function RecipeList() {
   const { refreshRecipes, updateRecipe, addRecipe, deleteRecipe } = useContext(
     RecipesActionsContext
   );
-  const { recipes, loading, lastAddedRecipeId } = useContext(RecipesDataContext);
+  const { recipes, loading, lastAddedRecipeId } = useContext(
+    RecipesDataContext
+  );
 
-  useEffect(() => refreshRecipes(), []);
+  useEffect(() => {
+    refreshRecipes();
+  }, [refreshRecipes]);
+
   useEffect(() => {
     setSelectedRecipeId(lastAddedRecipeId);
-  }, [lastAddedRecipeId])
+  }, [lastAddedRecipeId]);
 
   const handleAddRecipe = (oldName, newName) => {
     addRecipe({ name: newName });
@@ -35,24 +40,22 @@ function RecipeList() {
           placeholder="&#xf067; Add recipe..."
         />
         {recipes.map((recipe, i) => {
-          const isSelected = selectedRecipeId == recipe.id;
+          const isSelected = selectedRecipeId === recipe.id;
           return (
-            <>
-              <RecipeItem
-                key={recipe.id}
-                recipe={recipe}
-                onSelect={setSelectedRecipeId}
-                onDelete={deleteRecipe}
-                isSelected={isSelected}
-              />
-            </>
+            <RecipeItem
+              key={recipe.id}
+              recipe={recipe}
+              onSelect={setSelectedRecipeId}
+              onDelete={deleteRecipe}
+              isSelected={isSelected}
+            />
           );
         })}
       </>
     );
   };
 
-  const selectedRecipe = recipes.find((r) => r.id == selectedRecipeId);
+  const selectedRecipe = recipes.find((r) => r.id === selectedRecipeId);
   return (
     <div>
       <div>Recipe list here</div>

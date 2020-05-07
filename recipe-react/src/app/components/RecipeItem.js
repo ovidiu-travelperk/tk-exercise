@@ -5,6 +5,7 @@ function RecipeItem({ recipe, onSelect, onDelete, isSelected }) {
     if (onDelete) onDelete(recipe);
   };
 
+
   return (
     <div>
       <div
@@ -16,7 +17,7 @@ function RecipeItem({ recipe, onSelect, onDelete, isSelected }) {
         {recipe.name}
       </div>
       <div onClick={handleDelete}>
-        <i class="far fa-trash-alt"></i>
+        <i className="far fa-trash-alt"></i>
       </div>
     </div>
   );

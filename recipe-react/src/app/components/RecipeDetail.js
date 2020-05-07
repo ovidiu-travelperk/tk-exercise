@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import IngredientItem from "./IngredientItem";
 import EditableValue from "./EditableValue";
 
@@ -53,8 +53,9 @@ function RecipeDetail({ id, name, ingredients, onUpdate }) {
         <ul>
           {ingredients.map((ingredient) => {
             return (
-              <li>
+              <li key={ingredient.name}>
                 <IngredientItem
+                  key={ingredient.name}
                   ingredient={ingredient}
                   onRename={handleRenameIngredient}
                   onDelete={handleDeleteIngredient}
