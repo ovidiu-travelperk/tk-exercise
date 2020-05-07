@@ -18,6 +18,7 @@ function RecipeDetail({ id, name, ingredients, onUpdate }) {
   };
 
   const handleRenameRecipe = (oldValue, newValue) => {
+    if (!Boolean(newValue) || !Boolean(newValue.trim())) return;
     updateRecipe({
       name: newValue,
     });

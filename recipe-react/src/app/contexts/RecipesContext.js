@@ -1,5 +1,10 @@
 import React, { createContext, useState, useEffect } from "react";
-import { getRecipes } from "../../data/recipe/api";
+import {
+  getRecipes,
+  updateRecipe,
+  deleteRecipe,
+  addRecipe,
+} from "../../data/recipe/api";
 import { recipeFabricator } from "../../data/recipe/fabricators";
 import { v4 as uuidv4 } from "uuid";
 
@@ -15,9 +20,40 @@ const apiRecipeActions = (getRecipesData, setRecipesData) => {
         loading: false,
       }));
     },
+    updateRecipe: async (recipe) => {
+      const result = await updateRecipe(recipe);
+      const resultRecipe = result.data;
+      setRecipesData((data) => ({
+        ...data,
+        recipes: data.recipes.map((rcp) =>
+          rcp.id === recipe.id ? { ...rcp, ...resultRecipe } : rcp
+        ),
+      }));
+    },
+    addRecipe: async (recipe) => {
+      recipe = {
+        ingredients: [],
+        name: "New recipe",
+        ...recipe,
+      };
+      const result = await addRecipe(recipe);
+      const resultRecipe = result.data;
+      setRecipesData((data) => ({
+        ...data,
+        recipes: [...data.recipes, resultRecipe],
+        lastAddedRecipeId: resultRecipe.id,
+      }));
+    },
+    deleteRecipe: async (recipe) => {
+      const result = await deleteRecipe(recipe);
+      setRecipesData((data) => ({
+        ...data,
+        recipes: data.recipes.filter((rcp) => rcp.id !== recipe.id),
+      }));
+    },
   };
 
-  return recipeActions;
+  return { recipeActions };
 };
 
 const localRecipeActions = (getRecipesData, setRecipesData) => {
@@ -47,6 +83,7 @@ const localRecipeActions = (getRecipesData, setRecipesData) => {
     addRecipe: (recipe) => {
       recipe = {
         ingredients: [],
+        name: "New recipe",
         ...recipe,
         id: uuidv4(),
       };
@@ -54,7 +91,7 @@ const localRecipeActions = (getRecipesData, setRecipesData) => {
       setRecipesData((data) => ({
         ...data,
         recipes: [...data.recipes, recipe],
-        lastAddedRecipeId: recipe.id
+        lastAddedRecipeId: recipe.id,
       }));
     },
     deleteRecipe: (recipe) => {
@@ -74,7 +111,7 @@ export function RecipesProvider(props) {
     loading: false,
   });
 
-  const { recipeActions, handleRecipesChanged } = localRecipeActions(
+  const { recipeActions, handleRecipesChanged } = apiRecipeActions(
     () => recipesData,
     setRecipesData
   );
