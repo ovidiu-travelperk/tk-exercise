@@ -2,7 +2,6 @@ import React from "react";
 import RecipeList from "./components/RecipeList";
 import { RecipesProvider } from "./contexts/RecipesContext";
 import { Switch, BrowserRouter as Router, Route } from "react-router-dom";
-import RecipeDetail from "./components/RecipeDetail";
 import RecipeDetailLoader from "./components/RecipeDetailLoader";
 
 function RecipeApp() {

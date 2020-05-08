@@ -3,6 +3,7 @@ import {
   recipeActions,
   handleRecipesChanged,
   setSetRecipesData,
+  setGetRecipesData,
 } from "./ApiRecipeActions";
 
 export const RecipesDataContext = createContext();
@@ -15,6 +16,7 @@ export function RecipesProvider(props) {
   });
 
   setSetRecipesData(setRecipesData);
+  setGetRecipesData(() => recipesData);
 
   useEffect(() => {
     if (handleRecipesChanged) handleRecipesChanged(recipesData);

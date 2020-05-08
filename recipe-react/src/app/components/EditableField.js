@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
+import PropTypes from "prop-types";
 import { useInputState } from "../hooks/useInputState";
 
-function EditableField({ value, onValueChanged, onlyEdit, placeholder }) {
+const EditableField = ({ value, onValueChanged, onlyEdit, placeholder }) => {
   const [isEdited, setIsEdited] = useState(false);
   const [newValue, handleValueChange, resetNewValue] = useInputState(
     () => value
@@ -37,6 +38,13 @@ function EditableField({ value, onValueChanged, onlyEdit, placeholder }) {
       )}
     </div>
   );
+};
+
+EditableField.propTypes = {
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]), 
+  onValueChanged: PropTypes.func, 
+  onlyEdit: PropTypes.bool, 
+  placeholder: PropTypes.string
 }
 
 export default EditableField;

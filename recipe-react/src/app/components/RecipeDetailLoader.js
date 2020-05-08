@@ -6,14 +6,14 @@ import {
   RecipesDataContext,
 } from "../contexts/RecipesContext";
 
-function RecipeDetailLoader({ match }) {
+function RecipeDetailLoader() {
   const { recipeId } = useParams();
   const { loadRecipe, updateRecipe } = useContext(RecipesActionsContext);
   const { recipes } = useContext(RecipesDataContext);
 
   useEffect(() => {
     loadRecipe(recipeId);
-  }, []);
+  }, [loadRecipe, recipeId]);
 
   const renderRecipe = ()=>{
       if(!recipe)

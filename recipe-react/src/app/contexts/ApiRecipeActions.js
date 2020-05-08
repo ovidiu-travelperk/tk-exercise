@@ -1,8 +1,13 @@
 import * as api from "../../data/recipe/api";
 
 let setRecipesData;
+let getRecipesData;
+
 const setSetRecipesData = (handler) => {
   setRecipesData = handler;
+};
+const setGetRecipesData = (handler) => {
+  getRecipesData = handler;
 };
 
 const handleRecipesChanged = (recipesData) => {};
@@ -15,13 +20,18 @@ const recipeActionsBuilder = () => {
       loading: false,
     }));
   };
-  const loadRecipe = async (recipeId) => {
+  const loadRecipe = async (recipeId, forceLoad) => {
+    const isRecipeLoaded = getRecipesData
+      ? getRecipesData().recipes.find((r) => r.id === recipeId)
+      : false;
+
+    if (isRecipeLoaded && !forceLoad) return;
     const result = await api.getRecipe(recipeId);
     const recipe = result.data;
     setRecipesData((currentRecipeData) => {
       const currentRecipes = [...currentRecipeData.recipes];
       const existingRecipeIndex = currentRecipes.findIndex(
-        (r) => r.id == recipeId
+        (r) => r.id === recipeId
       );
 
       if (existingRecipeIndex > -1)
@@ -70,4 +80,9 @@ const recipeActionsBuilder = () => {
   return { refreshRecipes, loadRecipe, addRecipe, updateRecipe, deleteRecipe };
 };
 const recipeActions = recipeActionsBuilder();
-export { recipeActions, setSetRecipesData, handleRecipesChanged };
+export {
+  recipeActions,
+  setSetRecipesData,
+  setGetRecipesData,
+  handleRecipesChanged,
+};

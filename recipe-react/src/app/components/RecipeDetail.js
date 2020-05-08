@@ -1,9 +1,10 @@
 import React from "react";
+import PropTypes from "prop-types";
 import IngredientItem from "./IngredientItem";
 import EditableField from "./EditableField";
 
-function RecipeDetail({ recipe, onUpdate }) {
-  const {id, name, ingredients} = recipe;
+const RecipeDetail = ({ recipe, onUpdate }) => {
+  const { name, ingredients } = recipe;
 
   const handleRenameIngredient = (ingredient, newName) => {
     updateRecipe({
@@ -20,14 +21,14 @@ function RecipeDetail({ recipe, onUpdate }) {
   };
 
   const handleRenameRecipe = (oldValue, newValue) => {
-    if (!Boolean(newValue) || !Boolean(newValue.trim())) return;
+    if (!newValue || !newValue.trim()) return;
     updateRecipe({
       name: newValue,
     });
   };
 
   const handleAddIngredient = (oldValue, newValue) => {
-    if (!Boolean(newValue.trim())) return;
+    if (!newValue.trim()) return;
     updateRecipe({
       ingredients: [...(ingredients || []), { name: newValue }],
     });
@@ -77,6 +78,11 @@ function RecipeDetail({ recipe, onUpdate }) {
       </div>
     </div>
   );
-}
+};
+
+RecipeDetail.propTypes = {
+  recipe: PropTypes.object.isRequired,
+  onUpdate: PropTypes.func,
+};
 
 export default RecipeDetail;

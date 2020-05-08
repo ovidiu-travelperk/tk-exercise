@@ -6,9 +6,11 @@ import {
 } from "../contexts/RecipesContext";
 import EditableField from "./EditableField";
 import RecipeItem from "./RecipeItem";
+import { useHistory } from "react-router-dom";
 
 function RecipeList() {
   const [selectedRecipeId, setSelectedRecipeId] = useState();
+  const history = useHistory();
 
   const { refreshRecipes, updateRecipe, addRecipe, deleteRecipe } = useContext(
     RecipesActionsContext
@@ -28,6 +30,12 @@ function RecipeList() {
   const handleAddRecipe = (oldName, newName) => {
     addRecipe({ name: newName });
   };
+
+  const handleSelectRecipe = (recipe) => {
+    //setSelectedRecipeId(recipe.id);
+    history.push(`/recipes/${recipe.id}`)
+  };
+
   const renderRecipes = () => {
     if (!recipes) return;
 
@@ -39,13 +47,13 @@ function RecipeList() {
           onValueChanged={handleAddRecipe}
           placeholder="&#xf067; Add recipe..."
         />
-        {recipes.map((recipe, i) => {
+        {recipes.map((recipe) => {
           const isSelected = selectedRecipeId === recipe.id;
           return (
             <RecipeItem
               key={recipe.id}
               recipe={recipe}
-              onSelect={setSelectedRecipeId}
+              onSelect={handleSelectRecipe}
               onDelete={deleteRecipe}
               isSelected={isSelected}
             />

@@ -1,9 +1,10 @@
 import React from "react";
 import EditableField from "./EditableField";
+import PropTypes from 'prop-types'
 
-function IngredientItem({ ingredient, onRename, onDelete }) {
+const  IngredientItem = ({ ingredient, onRename, onDelete }) => {
   const handleRename = (oldName, newName) => {
-    if (!Boolean(newName) || !Boolean(newName.trim())) handleDelete();
+    if (!newName || !newName.trim()) handleDelete();
     else if (onRename) onRename(ingredient, newName);
   };
 
@@ -19,6 +20,12 @@ function IngredientItem({ ingredient, onRename, onDelete }) {
       </div>
     </div>
   );
+}
+
+IngredientItem.propTypes = {
+  ingredient: PropTypes.object.isRequired,
+  onRename: PropTypes.func,
+  onDelete: PropTypes.func
 }
 
 export default IngredientItem;
