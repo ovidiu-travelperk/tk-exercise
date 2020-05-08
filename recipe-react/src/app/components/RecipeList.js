@@ -64,7 +64,7 @@ function RecipeList() {
         {renderRecipes()}
       </div>
       {selectedRecipe && (
-        <RecipeDetail {...selectedRecipe} onUpdate={updateRecipe} />
+        <RecipeDetail recipe={selectedRecipe} onUpdate={updateRecipe} />
       )}
     </div>
   );

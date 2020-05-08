@@ -2,7 +2,9 @@ import React from "react";
 import IngredientItem from "./IngredientItem";
 import EditableField from "./EditableField";
 
-function RecipeDetail({ id, name, ingredients, onUpdate }) {
+function RecipeDetail({ recipe, onUpdate }) {
+  const {id, name, ingredients} = recipe;
+
   const handleRenameIngredient = (ingredient, newName) => {
     updateRecipe({
       ingredients: ingredients.map((ing) =>
@@ -33,9 +35,7 @@ function RecipeDetail({ id, name, ingredients, onUpdate }) {
 
   const updateRecipe = (recipeValues) => {
     const modifiedRecipe = {
-      id,
-      name,
-      ingredients,
+      ...recipe,
       ...recipeValues,
     };
 
